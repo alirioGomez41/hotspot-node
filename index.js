@@ -11,7 +11,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // Configuración de la base de datos
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
+const sequelize = new Sequelize(process.env.MYSQL_URL, {
 dialect: 'mysql'
 });
 
