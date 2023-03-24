@@ -2,7 +2,7 @@ const express = require('express');
 const { Sequelize, DataTypes } = require('sequelize');
 const { body, validationResult } = require('express-validator');
 const dotenv = require('dotenv');
-
+const cors = require('cors');
 dotenv.config();
 
 const app = express();
