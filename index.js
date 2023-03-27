@@ -50,7 +50,7 @@ const Usuarios = sequelize.define('usuarios', {
 
 app.use(express.json());
 
-// Definición de las rutas de la API
+// Enviando usuario
 app.post('/usuarios', [
   body('nombre_apellido').notEmpty().withMessage('El campo nombre_apellido es requerido'),
   body('email').notEmpty().withMessage('El campo email es requerido'),
@@ -82,6 +82,7 @@ app.post('/usuarios', [
   return res.json(nuevoUsuario);
 });
 
+// Obteniendo usuarios
 app.get('/usuarios', async (req, res) => {
   const page = req.query.page || 1;
   const per_page = req.query.per_page || 10;
@@ -97,6 +98,31 @@ app.get('/usuarios', async (req, res) => {
     pages: Math.ceil(count / limit)
   });
 });
+
+// Verifica si un correo electrónico ya existe en la base de datos
+app.post('/usuarios/verificar-correo', [
+  body('email').notEmpty().withMessage('El campo email es requerido'),
+  body('email').isEmail().withMessage('El campo email debe ser una dirección de correo electrónico válida')
+], async (req, res) => {
+
+  // Validación de entrada
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  // Verificar si el correo electrónico ya existe en la base de datos
+  const { email } = req.body;
+  const usuarioExistente = await Usuarios.findOne({ where: { email } });
+
+  if (usuarioExistente) {
+    return res.status(200).json({ message: 'El correo electrónico ya existe en la base de datos' });
+  } else {
+    return res.status(409).json({ message: 'El correo electrónico no existe en la base de datos' });
+  }
+});
+
+
 
 // Sincronización de la base de datos y ejecución de la aplicación de Express
 sequelize.sync().then(() => {
